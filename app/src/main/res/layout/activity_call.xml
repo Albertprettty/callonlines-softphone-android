@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/text_secondary"
+        android:textSize="14sp"
+        android:letterSpacing="0.1"
+        tools:text="Llamando..." />
+
+    <TextView
+        android:id="@+id/tvRemote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/text_primary"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        tools:text="Desconocido" />
+
+    <TextView
+        android:id="@+id/tvDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/primary_cyan"
+        android:textSize="20sp"
+        android:layout_marginTop="8dp"
+        tools:text="00:00" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Active call controls -->
+    <LinearLayout
+        android:id="@+id/activeControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="20dp">
+
+        <ImageView
+            android:id="@+id/btnMute"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_mic"
+            android:background="@drawable/bg_dial_key"
+            android:padding="18dp"
+            android:contentDescription="Mute"
+            app:tint="@color/text_primary" />
+
+        <Space
+            android:layout_width="36dp"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:id="@+id/btnSpeaker"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_speaker_off"
+            android:background="@drawable/bg_dial_key"
+            android:padding="18dp"
+            android:contentDescription="Altavoz"
+            app:tint="@color/text_primary" />
+    </LinearLayout>
+
+    <!-- Hangup -->
+    <ImageView
+        android:id="@+id/btnHangup"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/ic_call_end"
+        android:background="@drawable/bg_hangup"
+        android:padding="24dp"
+        android:contentDescription="Colgar"
+        app:tint="@color/white" />
+
+    <!-- Incoming call controls -->
+    <LinearLayout
+        android:id="@+id/incomingControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/btnDecline"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:src="@drawable/ic_call_end"
+            android:background="@drawable/bg_hangup"
+            android:padding="22dp"
+            android:contentDescription="Rechazar"
+            app:tint="@color/white" />
+
+        <Space
+            android:layout_width="48dp"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:id="@+id/btnAnswer"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:src="@drawable/ic_call"
+            android:background="@drawable/bg_call_button"
+            android:padding="22dp"
+            android:contentDescription="Contestar"
+            app:tint="@color/white" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="24dp" />
+
+</LinearLayout>
