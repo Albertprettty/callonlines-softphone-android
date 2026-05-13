@@ -9,7 +9,6 @@ import com.callonlines.softphone.databinding.ActivityCallBinding
 import org.linphone.core.Call
 
 class CallActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityCallBinding
     private var startTimeMs = 0L
     private val timerHandler = Handler(Looper.getMainLooper())
@@ -17,8 +16,7 @@ class CallActivity : AppCompatActivity() {
         override fun run() {
             if (startTimeMs > 0) {
                 val elapsed = (System.currentTimeMillis() - startTimeMs) / 1000
-                val mm = elapsed / 60
-                val ss = elapsed % 60
+                val mm = elapsed / 60; val ss = elapsed % 60
                 binding.tvDuration.text = String.format("%02d:%02d", mm, ss)
             }
             timerHandler.postDelayed(this, 1000)
@@ -30,18 +28,14 @@ class CallActivity : AppCompatActivity() {
         binding = ActivityCallBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnHangup.setOnClickListener {
-            LinphoneManager.hangup()
-            finish()
-        }
+        binding.btnHangup.setOnClickListener { LinphoneManager.hangup(); finish() }
         binding.btnMute.setOnClickListener { updateMuteUI(LinphoneManager.toggleMute()) }
         binding.btnSpeaker.setOnClickListener { updateSpeakerUI(LinphoneManager.toggleSpeaker()) }
         binding.btnAnswer.setOnClickListener {
             LinphoneManager.currentCall.value?.let { LinphoneManager.answer(it) }
         }
         binding.btnDecline.setOnClickListener {
-            LinphoneManager.currentCall.value?.let { LinphoneManager.decline(it) }
-            finish()
+            LinphoneManager.currentCall.value?.let { LinphoneManager.decline(it) }; finish()
         }
 
         updateMuteUI(LinphoneManager.isMuted())
@@ -55,16 +49,14 @@ class CallActivity : AppCompatActivity() {
                     binding.activeControls.visibility = View.GONE
                     binding.btnHangup.visibility = View.GONE
                 }
-                Call.State.OutgoingInit,
-                Call.State.OutgoingProgress -> {
+                Call.State.OutgoingInit, Call.State.OutgoingProgress -> {
                     binding.tvStatus.text = "Llamando…"
                     binding.incomingControls.visibility = View.GONE
                     binding.activeControls.visibility = View.VISIBLE
                     binding.btnHangup.visibility = View.VISIBLE
                 }
                 Call.State.OutgoingRinging -> binding.tvStatus.text = "Sonando…"
-                Call.State.Connected,
-                Call.State.StreamsRunning -> {
+                Call.State.Connected, Call.State.StreamsRunning -> {
                     if (startTimeMs == 0L) {
                         startTimeMs = System.currentTimeMillis()
                         timerHandler.post(timerRunnable)
@@ -77,7 +69,6 @@ class CallActivity : AppCompatActivity() {
                 Call.State.End, Call.State.Released -> {
                     timerHandler.removeCallbacks(timerRunnable)
                     binding.tvStatus.text = "Llamada finalizada"
-                    // Stay on screen so user can see the reason and tap Hangup to close.
                 }
                 Call.State.Error -> {
                     timerHandler.removeCallbacks(timerRunnable)
@@ -87,32 +78,22 @@ class CallActivity : AppCompatActivity() {
             }
         }
 
-        LinphoneManager.callReason.observe(this) { reason ->
-            binding.tvReason.text = reason
-        }
+        LinphoneManager.callReason.observe(this) { reason -> binding.tvReason.text = reason }
 
         LinphoneManager.currentCall.observe(this) { call ->
             call?.remoteAddress?.let { addr ->
-                val name = addr.displayName ?: addr.username ?: "Desconocido"
-                binding.tvRemote.text = name
+                binding.tvRemote.text = addr.displayName ?: addr.username ?: "Desconocido"
             }
         }
     }
 
     private fun updateMuteUI(muted: Boolean) {
-        binding.btnMute.setImageResource(
-            if (muted) R.drawable.ic_mic_off else R.drawable.ic_mic
-        )
+        binding.btnMute.setImageResource(if (muted) R.drawable.ic_mic_off else R.drawable.ic_mic)
     }
-
     private fun updateSpeakerUI(on: Boolean) {
-        binding.btnSpeaker.setImageResource(
-            if (on) R.drawable.ic_speaker else R.drawable.ic_speaker_off
-        )
+        binding.btnSpeaker.setImageResource(if (on) R.drawable.ic_speaker else R.drawable.ic_speaker_off)
     }
-
     override fun onDestroy() {
-        timerHandler.removeCallbacks(timerRunnable)
-        super.onDestroy()
+        timerHandler.removeCallbacks(timerRunnable); super.onDestroy()
     }
 }

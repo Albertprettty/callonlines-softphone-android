@@ -27,7 +27,6 @@ class CallOnLinesCoreService : CoreService() {
         mServiceNotification = NotificationCompat.Builder(this, SoftphoneApp.CHANNEL_CALL_ID)
             .setContentTitle("CallOnLines")
             .setContentText("Llamada en curso")
-            // Use a built-in system icon — guaranteed to render as small icon.
             .setSmallIcon(android.R.drawable.sym_action_call)
             .setOngoing(true)
             .setCategory(NotificationCompat.CATEGORY_CALL)
@@ -43,29 +42,23 @@ class CallOnLinesCoreService : CoreService() {
         DiagLog.i("CoreService showForegroundServiceNotification(video=$isVideoCall)")
         try {
             if (mServiceNotification == null) createServiceNotification()
-            val notif: Notification = mServiceNotification ?: run {
-                DiagLog.w("notification still null, building fallback")
-                NotificationCompat.Builder(this, SoftphoneApp.CHANNEL_CALL_ID)
-                    .setContentTitle("CallOnLines")
-                    .setContentText("Llamada en curso")
-                    .setSmallIcon(android.R.drawable.sym_action_call)
-                    .setOngoing(true)
-                    .build()
-            }
+            val notif: Notification = mServiceNotification ?: NotificationCompat.Builder(
+                this, SoftphoneApp.CHANNEL_CALL_ID
+            ).setContentTitle("CallOnLines")
+              .setContentText("Llamada")
+              .setSmallIcon(android.R.drawable.sym_action_call)
+              .setOngoing(true)
+              .build()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val type = ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL or
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
                 try {
                     startForeground(NOTIF_ID, notif, type)
-                    DiagLog.i("startForeground OK with type=phoneCall|microphone")
+                    DiagLog.i("startForeground OK (typed)")
                 } catch (e: Throwable) {
-                    DiagLog.e("startForeground with type failed", e)
-                    try {
-                        startForeground(NOTIF_ID, notif)
-                        DiagLog.i("startForeground OK without type")
-                    } catch (e2: Throwable) {
-                        DiagLog.e("startForeground without type ALSO failed", e2)
-                    }
+                    DiagLog.e("startForeground typed failed", e)
+                    try { startForeground(NOTIF_ID, notif); DiagLog.i("startForeground OK (no type)") }
+                    catch (e2: Throwable) { DiagLog.e("startForeground untyped also failed", e2) }
                 }
             } else {
                 startForeground(NOTIF_ID, notif)
@@ -78,12 +71,10 @@ class CallOnLinesCoreService : CoreService() {
 
     override fun hideForegroundServiceNotification() {
         DiagLog.i("CoreService hideForegroundServiceNotification")
-        try { stopForeground(STOP_FOREGROUND_REMOVE) } catch (e: Throwable) {
-            DiagLog.e("stopForeground failed", e)
+        try { stopForeground(STOP_FOREGROUND_REMOVE) } catch (t: Throwable) {
+            DiagLog.e("stopForeground failed", t)
         }
     }
 
-    private companion object {
-        const val NOTIF_ID = 4242
-    }
+    private companion object { const val NOTIF_ID = 4242 }
 }

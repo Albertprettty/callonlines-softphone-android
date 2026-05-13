@@ -13,7 +13,6 @@ import org.linphone.core.Call
 import org.linphone.core.RegistrationState
 
 class DialerActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityDialerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,32 +43,23 @@ class DialerActivity : AppCompatActivity() {
                 binding.btnBack.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             }
         }
-        binding.btnBack.setOnLongClickListener {
-            binding.etNumber.setText("")
-            true
-        }
+        binding.btnBack.setOnLongClickListener { binding.etNumber.setText(""); true }
 
         binding.btnCall.setOnClickListener {
             val number = binding.etNumber.text?.toString()?.trim().orEmpty()
-            if (number.isBlank()) {
-                Toast.makeText(this, "Escribe un numero", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+            if (number.isBlank()) { Toast.makeText(this, "Escribe un numero", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
             if (LinphoneManager.registrationState.value != RegistrationState.Ok) {
                 Toast.makeText(this, "Espera a estar Conectado", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             try {
-                DiagLog.i("UI: btnCall pressed number=$number")
+                DiagLog.i("UI btnCall number=$number")
                 val call = LinphoneManager.call(number)
-                if (call != null) {
-                    startActivity(Intent(this, CallActivity::class.java))
-                } else {
-                    Toast.makeText(this, "No se pudo iniciar la llamada — ver Diagnostico", Toast.LENGTH_LONG).show()
-                }
-            } catch (e: Throwable) {
-                DiagLog.e("UI: btnCall threw", e)
-                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                if (call != null) startActivity(Intent(this, CallActivity::class.java))
+                else Toast.makeText(this, "No se pudo iniciar la llamada (revisa Diagnostico)", Toast.LENGTH_LONG).show()
+            } catch (t: Throwable) {
+                DiagLog.e("UI btnCall threw", t)
+                Toast.makeText(this, "Error: ${t.message}", Toast.LENGTH_LONG).show()
             }
         }
 
@@ -85,14 +75,10 @@ class DialerActivity : AppCompatActivity() {
                     })
                     finish()
                 }
-                .setNegativeButton("Cancelar", null)
-                .show()
+                .setNegativeButton("Cancelar", null).show()
         }
-
-        // Long-press the logout icon to open the diagnostic screen.
         binding.btnLogout.setOnLongClickListener {
-            startActivity(Intent(this, DiagActivity::class.java))
-            true
+            startActivity(Intent(this, DiagActivity::class.java)); true
         }
 
         LinphoneManager.registrationState.observe(this) { state ->

@@ -11,37 +11,21 @@ android {
         applicationId = "com.callonlines.softphone"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.2.0"
     }
-
     buildTypes {
-        debug {
-            isMinifyEnabled = false
-        }
-        release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
+        debug { isMinifyEnabled = false }
+        release { isMinifyEnabled = false }
     }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
-    buildFeatures {
-        viewBinding = true
-    }
-
+    kotlinOptions { jvmTarget = "17" }
+    buildFeatures { viewBinding = true }
     packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
+        resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" }
     }
 }
 

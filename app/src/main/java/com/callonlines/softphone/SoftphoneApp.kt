@@ -13,38 +13,28 @@ class SoftphoneApp : Application() {
         createNotificationChannels()
         try {
             LinphoneManager.init(this)
-            DiagLog.i("LinphoneManager.init invoked")
         } catch (t: Throwable) {
-            DiagLog.e("LinphoneManager.init threw", t)
+            DiagLog.e("LinphoneManager.init failed", t)
         }
     }
-
     private fun installCrashHandler() {
         val prev = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-            try {
-                DiagLog.e("UNCAUGHT in ${thread.name}", throwable)
-            } catch (_: Throwable) {}
+            try { DiagLog.e("UNCAUGHT in ${thread.name}", throwable) } catch (_: Throwable) {}
             prev?.uncaughtException(thread, throwable)
         }
     }
-
     private fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val nm = getSystemService(NotificationManager::class.java) ?: return
-        val callChannel = NotificationChannel(
-            CHANNEL_CALL_ID,
-            "Llamadas en curso",
+        nm.createNotificationChannel(NotificationChannel(
+            CHANNEL_CALL_ID, "Llamadas en curso",
             NotificationManager.IMPORTANCE_LOW
         ).apply {
             description = "Notificacion persistente mientras hay una llamada activa"
-            enableVibration(false)
-            enableLights(false)
-            setShowBadge(false)
-        }
-        nm.createNotificationChannel(callChannel)
+            enableVibration(false); enableLights(false); setShowBadge(false)
+        })
     }
-
     companion object {
         const val CHANNEL_CALL_ID = "callonlines_call_channel"
     }

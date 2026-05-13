@@ -13,7 +13,6 @@ import com.callonlines.softphone.databinding.ActivityLoginBinding
 import org.linphone.core.RegistrationState
 
 class LoginActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityLoginBinding
     private lateinit var creds: CredentialStore
     private var triedSavedLogin = false
@@ -37,13 +36,10 @@ class LoginActivity : AppCompatActivity() {
         binding.etPass.setText(creds.getPass())
 
         binding.btnLogin.setOnClickListener {
-            val user = binding.etUser.text.toString().trim()
-            val pass = binding.etPass.text.toString()
-            if (user.isBlank() || pass.isBlank()) {
-                binding.tvStatus.text = "Escribe usuario y contraseña"
-                return@setOnClickListener
-            }
-            doLogin(user, pass)
+            val u = binding.etUser.text.toString().trim()
+            val p = binding.etPass.text.toString()
+            if (u.isBlank() || p.isBlank()) { binding.tvStatus.text = "Escribe usuario y contraseña"; return@setOnClickListener }
+            doLogin(u, p)
         }
 
         LinphoneManager.registrationState.observe(this) { state ->
@@ -76,12 +72,10 @@ class LoginActivity : AppCompatActivity() {
     private fun requestRuntimePermissions() {
         val needed = mutableListOf<String>()
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-            != PackageManager.PERMISSION_GRANTED
-        ) needed += Manifest.permission.RECORD_AUDIO
+            != PackageManager.PERMISSION_GRANTED) needed += Manifest.permission.RECORD_AUDIO
         if (Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-            != PackageManager.PERMISSION_GRANTED
-        ) needed += Manifest.permission.POST_NOTIFICATIONS
+            != PackageManager.PERMISSION_GRANTED) needed += Manifest.permission.POST_NOTIFICATIONS
         if (needed.isNotEmpty()) permissionLauncher.launch(needed.toTypedArray())
     }
 }

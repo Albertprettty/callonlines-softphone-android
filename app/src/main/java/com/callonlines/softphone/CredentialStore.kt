@@ -8,13 +8,9 @@ class CredentialStore(context: Context) {
         context.getSharedPreferences("cl_sip_creds", Context.MODE_PRIVATE)
 
     fun save(user: String, pass: String, domain: String) {
-        prefs.edit()
-            .putString(KEY_USER, user)
-            .putString(KEY_PASS, pass)
-            .putString(KEY_DOMAIN, domain)
-            .apply()
+        prefs.edit().putString(KEY_USER, user).putString(KEY_PASS, pass)
+            .putString(KEY_DOMAIN, domain).apply()
     }
-
     fun getUser(): String = prefs.getString(KEY_USER, "") ?: ""
     fun getPass(): String = prefs.getString(KEY_PASS, "") ?: ""
     fun getDomain(): String = prefs.getString(KEY_DOMAIN, DEFAULT_DOMAIN) ?: DEFAULT_DOMAIN

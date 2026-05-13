@@ -43,30 +43,25 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".DialerActivity"
+        <activity android:name=".DialerActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan" />
 
-        <activity
-            android:name=".CallActivity"
+        <activity android:name=".CallActivity"
             android:exported="false"
             android:launchMode="singleTask"
             android:showOnLockScreen="true"
             android:turnScreenOn="true" />
 
-        <!-- Our subclass of Linphone CoreService.
-             Correctly declares foregroundServiceType so Android 14+ accepts startForeground(). -->
+        <activity android:name=".DiagActivity"
+            android:exported="false"
+            android:label="Diagnostico" />
+
         <service
             android:name=".CallOnLinesCoreService"
             android:foregroundServiceType="phoneCall|microphone"
             android:exported="false"
             android:stopWithTask="false" />
 
-    
-        <activity android:name=".DiagActivity"
-            android:exported="false"
-            android:label="Diagnostico" />
     </application>
-
 </manifest>

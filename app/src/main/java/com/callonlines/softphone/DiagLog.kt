@@ -9,10 +9,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * Lightweight persistent diagnostic log for in-app debugging.
- * Survives app crashes. Capped at 200 KB.
- */
 object DiagLog {
     private const val TAG = "CL_Diag"
     private const val FILE_NAME = "softphone_diag.log"
@@ -42,9 +38,7 @@ object DiagLog {
 
     fun read(): String = try {
         file?.readText() ?: "(no log file)"
-    } catch (e: Exception) {
-        "read error: ${e.message}"
-    }
+    } catch (e: Exception) { "read error: ${e.message}" }
 
     fun clear() { try { file?.writeText("") } catch (_: Exception) {} }
 

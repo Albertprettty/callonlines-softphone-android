@@ -12,16 +12,13 @@
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
     </style>
-
     <style name="DialDigit" parent="">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">28sp</item>
-        <item name="android:textStyle">normal</item>
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
-
     <style name="DialLetters" parent="">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
