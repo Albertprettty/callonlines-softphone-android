@@ -1,0 +1,4 @@
+-keep class org.linphone.** { *; }
+-keep class org.linphone.mediastream.** { *; }
+-keep class org.linphone.core.** { *; }
+-dontwarn org.linphone.**
