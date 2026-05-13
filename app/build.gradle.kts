@@ -53,5 +53,5 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
     implementation("androidx.activity:activity-ktx:1.9.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("org.linphone:linphone-sdk-android:5.3.55")
+    implementation("org.linphone:linphone-sdk-android:5.4.86")
 }
