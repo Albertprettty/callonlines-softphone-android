@@ -5,17 +5,14 @@
     android:height="240dp"
     android:viewportWidth="240"
     android:viewportHeight="240">
-
     <path android:pathData="M120,120m-108,0a108,108 0,1 1,216 0a108,108 0,1 1,-216 0"
         android:strokeWidth="2"
         android:strokeColor="#1A22D3EE"
         android:fillColor="#00000000" />
-
     <path android:pathData="M120,120m-86,0a86,86 0,1 1,172 0a86,86 0,1 1,-172 0"
         android:strokeWidth="1.5"
         android:strokeColor="#22A855F7"
         android:fillColor="#00000000" />
-
     <path android:pathData="M155,90 C145,78 130,72 115,72 C90,72 70,92 70,118 C70,144 90,164 115,164 C130,164 145,158 155,146"
         android:strokeWidth="14"
         android:strokeLineCap="round"
@@ -30,7 +27,6 @@
             </gradient>
         </aapt:attr>
     </path>
-
     <path android:pathData="M180,80 m-7,0 a7,7 0,1 1,14 0 a7,7 0,1 1,-14 0"
         android:fillColor="#22D3EE" />
 </vector>

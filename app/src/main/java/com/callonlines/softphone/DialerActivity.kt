@@ -3,6 +3,7 @@ package com.callonlines.softphone
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.HapticFeedbackConstants
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +29,7 @@ class DialerActivity : AppCompatActivity() {
         )
         pad.forEach { (btn, digit) ->
             btn.setOnClickListener {
+                btn.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val cur = binding.etNumber.text?.toString() ?: ""
                 binding.etNumber.setText(cur + digit)
                 binding.etNumber.setSelection(binding.etNumber.text?.length ?: 0)
@@ -39,7 +41,12 @@ class DialerActivity : AppCompatActivity() {
             if (cur.isNotEmpty()) {
                 binding.etNumber.setText(cur.dropLast(1))
                 binding.etNumber.setSelection(binding.etNumber.text?.length ?: 0)
+                binding.btnBack.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             }
+        }
+        binding.btnBack.setOnLongClickListener {
+            binding.etNumber.setText("")
+            true
         }
 
         binding.btnCall.setOnClickListener {
@@ -67,9 +74,9 @@ class DialerActivity : AppCompatActivity() {
 
         binding.btnLogout.setOnClickListener {
             AlertDialog.Builder(this)
-                .setTitle("Cerrar sesion")
-                .setMessage("Desconectar tu cuenta SIP de este dispositivo?")
-                .setPositiveButton("Cerrar sesion") { _, _ ->
+                .setTitle("Cerrar sesión")
+                .setMessage("¿Desconectar tu cuenta SIP de este dispositivo?")
+                .setPositiveButton("Cerrar sesión") { _, _ ->
                     CredentialStore(this).clear()
                     LinphoneManager.logout()
                     startActivity(Intent(this, LoginActivity::class.java).apply {
@@ -84,10 +91,10 @@ class DialerActivity : AppCompatActivity() {
         LinphoneManager.registrationState.observe(this) { state ->
             val (text, color) = when (state) {
                 RegistrationState.Ok -> "Conectado" to R.color.status_ok
-                RegistrationState.Failed -> "Sin conexion" to R.color.status_fail
-                RegistrationState.Progress -> "Conectando..." to R.color.status_pending
+                RegistrationState.Failed -> "Sin conexión" to R.color.status_fail
+                RegistrationState.Progress -> "Conectando…" to R.color.status_pending
                 RegistrationState.Cleared -> "Desconectado" to R.color.status_fail
-                else -> "..." to R.color.status_pending
+                else -> "…" to R.color.status_pending
             }
             binding.tvStatus.text = text
             binding.statusDot.backgroundTintList =

@@ -1,15 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="DialKey">
+    <style name="DialKey" parent="">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_columnWeight">1</item>
         <item name="android:layout_rowWeight">1</item>
-        <item name="android:layout_margin">6dp</item>
+        <item name="android:layout_margin">5dp</item>
         <item name="android:background">@drawable/bg_dial_key</item>
-        <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">26sp</item>
-        <item name="android:textStyle">normal</item>
         <item name="android:gravity">center</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+    </style>
+
+    <style name="DialDigit" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="DialLetters" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/text_letters</item>
+        <item name="android:textSize">9sp</item>
+        <item name="android:letterSpacing">0.2</item>
+        <item name="android:layout_marginTop">-2dp</item>
     </style>
 </resources>

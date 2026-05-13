@@ -1,10 +1,7 @@
-# CallOnLines Softphone Android
+# CallOnLines Softphone (Android)
 
-SIP VoIP softphone for CallOnLines — built with Linphone SDK.
+VoIP/SIP softphone for CallOnLines. Audio only (Phase 1).
 
-- Server: `sip.callonlines.com:5060` (UDP)
+- Server: sip.callonlines.com (UDP 5060)
 - Codecs: Opus, PCMU, PCMA
-- Audio only (Phase 1)
-
-Built automatically by GitHub Actions on every push.
-Download the APK from the Actions tab → latest run → Artifacts.
+- Linphone SDK 5.4.86

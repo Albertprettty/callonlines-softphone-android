@@ -20,7 +20,7 @@ class LoginActivity : AppCompatActivity() {
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { /* continue regardless */ }
+    ) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -40,7 +40,7 @@ class LoginActivity : AppCompatActivity() {
             val user = binding.etUser.text.toString().trim()
             val pass = binding.etPass.text.toString()
             if (user.isBlank() || pass.isBlank()) {
-                binding.tvStatus.text = "Escribe usuario y contrasena"
+                binding.tvStatus.text = "Escribe usuario y contraseña"
                 return@setOnClickListener
             }
             doLogin(user, pass)
@@ -55,8 +55,8 @@ class LoginActivity : AppCompatActivity() {
                     startActivity(Intent(this, DialerActivity::class.java))
                     finish()
                 }
-                RegistrationState.Progress -> binding.tvStatus.text = "Conectando..."
-                RegistrationState.Failed -> binding.tvStatus.text = "Login fallido. Revisa usuario y contrasena."
+                RegistrationState.Progress -> binding.tvStatus.text = "Conectando…"
+                RegistrationState.Failed -> binding.tvStatus.text = "Login fallido. Revisa usuario y contraseña."
                 RegistrationState.Cleared -> binding.tvStatus.text = ""
                 else -> {}
             }
@@ -69,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun doLogin(user: String, pass: String) {
-        binding.tvStatus.text = "Conectando..."
+        binding.tvStatus.text = "Conectando…"
         LinphoneManager.login(user, pass, creds.getDomain())
     }
 

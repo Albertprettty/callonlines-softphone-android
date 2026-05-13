@@ -64,6 +64,7 @@ object LinphoneManager {
             core.addListener(coreListener)
             core.start()
             initialized = true
+            Log.i(TAG, "Linphone Core started (version ${core.version})")
         } catch (e: Exception) {
             Log.e(TAG, "init failed", e)
         }

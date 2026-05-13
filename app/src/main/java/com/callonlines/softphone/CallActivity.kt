@@ -49,14 +49,16 @@ class CallActivity : AppCompatActivity() {
                     binding.tvStatus.text = "Llamada entrante"
                     binding.incomingControls.visibility = View.VISIBLE
                     binding.activeControls.visibility = View.GONE
+                    binding.btnHangup.visibility = View.GONE
                 }
                 Call.State.OutgoingInit,
                 Call.State.OutgoingProgress -> {
-                    binding.tvStatus.text = "Llamando..."
+                    binding.tvStatus.text = "Llamando…"
                     binding.incomingControls.visibility = View.GONE
                     binding.activeControls.visibility = View.VISIBLE
+                    binding.btnHangup.visibility = View.VISIBLE
                 }
-                Call.State.OutgoingRinging -> binding.tvStatus.text = "Sonando..."
+                Call.State.OutgoingRinging -> binding.tvStatus.text = "Sonando…"
                 Call.State.Connected,
                 Call.State.StreamsRunning -> {
                     if (startTimeMs == 0L) {
@@ -66,6 +68,7 @@ class CallActivity : AppCompatActivity() {
                     binding.tvStatus.text = "En llamada"
                     binding.incomingControls.visibility = View.GONE
                     binding.activeControls.visibility = View.VISIBLE
+                    binding.btnHangup.visibility = View.VISIBLE
                 }
                 Call.State.End, Call.State.Released -> {
                     timerHandler.removeCallbacks(timerRunnable)

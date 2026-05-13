@@ -6,14 +6,13 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-    <!-- Foreground service (needed by Linphone CoreService during calls) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
@@ -56,22 +55,13 @@
             android:showOnLockScreen="true"
             android:turnScreenOn="true" />
 
-        <!-- Linphone built-in foreground service for keeping calls alive -->
+        <!-- Our subclass of Linphone CoreService.
+             Correctly declares foregroundServiceType so Android 14+ accepts startForeground(). -->
         <service
-            android:name="org.linphone.core.tools.service.CoreService"
+            android:name=".CallOnLinesCoreService"
             android:foregroundServiceType="phoneCall|microphone"
             android:exported="false"
             android:stopWithTask="false" />
-
-        <!-- Linphone helper receivers -->
-        <receiver
-            android:name="org.linphone.core.tools.receiver.BootReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
 
     </application>
 

@@ -5,18 +5,18 @@
         <item name="colorPrimary">@color/primary_cyan</item>
         <item name="colorOnPrimary">@color/bg_darker</item>
         <item name="colorSecondary">@color/primary_purple</item>
-        <item name="android:statusBarColor">@color/bg_dark</item>
-        <item name="android:navigationBarColor">@color/bg_dark</item>
-        <item name="android:windowBackground">@color/bg_dark</item>
+        <item name="android:statusBarColor">@color/bg_darker</item>
+        <item name="android:navigationBarColor">@color/bg_darker</item>
+        <item name="android:windowBackground">@color/bg_darker</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
     </style>
 
     <style name="Theme.CallOnLinesSoftphone.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/bg_dark</item>
+        <item name="windowSplashScreenBackground">@color/bg_darker</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
-        <item name="windowSplashScreenIconBackgroundColor">@color/bg_dark</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/bg_darker</item>
         <item name="postSplashScreenTheme">@style/Theme.CallOnLinesSoftphone</item>
     </style>
 
