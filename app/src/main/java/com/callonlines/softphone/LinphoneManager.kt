@@ -1,6 +1,7 @@
 package com.callonlines.softphone
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import org.linphone.core.Account
 import org.linphone.core.AudioDevice
@@ -8,10 +9,13 @@ import org.linphone.core.Call
 import org.linphone.core.Core
 import org.linphone.core.CoreListenerStub
 import org.linphone.core.Factory
+import org.linphone.core.MediaEncryption
 import org.linphone.core.RegistrationState
 import org.linphone.core.TransportType
 
 object LinphoneManager {
+
+    private const val TAG = "LinphoneManager"
 
     private lateinit var core: Core
     private lateinit var factory: Factory
@@ -28,6 +32,7 @@ object LinphoneManager {
             state: RegistrationState?,
             message: String
         ) {
+            Log.d(TAG, "Registration -> $state ($message)")
             registrationState.postValue(state ?: RegistrationState.None)
         }
 
@@ -37,6 +42,7 @@ object LinphoneManager {
             state: Call.State?,
             message: String
         ) {
+            Log.d(TAG, "Call -> $state ($message)")
             callState.postValue(state ?: Call.State.Idle)
             currentCall.postValue(call)
         }
@@ -44,15 +50,23 @@ object LinphoneManager {
 
     fun init(context: Context) {
         if (initialized) return
-        factory = Factory.instance()
-        factory.setDebugMode(false, "CallOnLinesSoftphone")
-        core = factory.createCore(null, null, context)
-        core.isNetworkReachable = true
-        core.isKeepAliveEnabled = true
-        core.isAutoIterateEnabled = true
-        core.addListener(coreListener)
-        core.start()
-        initialized = true
+        try {
+            factory = Factory.instance()
+            factory.setDebugMode(false, "CallOnLinesSoftphone")
+            core = factory.createCore(null, null, context)
+
+            core.isNetworkReachable = true
+            core.isKeepAliveEnabled = true
+            core.isAutoIterateEnabled = true
+            core.isNativeRingingEnabled = true
+            core.mediaEncryption = MediaEncryption.None
+
+            core.addListener(coreListener)
+            core.start()
+            initialized = true
+        } catch (e: Exception) {
+            Log.e(TAG, "init failed", e)
+        }
     }
 
     fun login(
@@ -61,6 +75,7 @@ object LinphoneManager {
         domain: String,
         transport: TransportType = TransportType.Udp
     ): Boolean {
+        if (!initialized) return false
         return try {
             core.clearAccounts()
             core.clearAllAuthInfo()
@@ -84,7 +99,7 @@ object LinphoneManager {
             configureCodecs()
             true
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "login failed", e)
             false
         }
     }
@@ -97,12 +112,20 @@ object LinphoneManager {
     }
 
     fun call(number: String): Call? {
-        val account = core.defaultAccount ?: return null
-        val domain = account.params.serverAddress?.domain ?: return null
-        val address = factory.createAddress("sip:$number@$domain") ?: return null
-        val params = core.createCallParams(null) ?: return null
-        params.isVideoEnabled = false
-        return core.inviteAddressWithParams(address, params)
+        if (!initialized) return null
+        return try {
+            val account = core.defaultAccount ?: return null
+            val domain = account.params.serverAddress?.domain ?: return null
+            val target = if (number.contains("@")) "sip:$number" else "sip:$number@$domain"
+            val address = factory.createAddress(target) ?: return null
+            val params = core.createCallParams(null) ?: return null
+            params.isVideoEnabled = false
+            params.mediaEncryption = MediaEncryption.None
+            core.inviteAddressWithParams(address, params)
+        } catch (e: Exception) {
+            Log.e(TAG, "call failed", e)
+            null
+        }
     }
 
     fun answer(call: Call) {
@@ -110,7 +133,9 @@ object LinphoneManager {
             val params = core.createCallParams(call)
             params?.isVideoEnabled = false
             call.acceptWithParams(params)
-        } catch (_: Exception) {}
+        } catch (e: Exception) {
+            Log.e(TAG, "answer failed", e)
+        }
     }
 
     fun decline(call: Call) {
@@ -124,23 +149,29 @@ object LinphoneManager {
     }
 
     fun toggleMute(): Boolean {
-        core.isMicEnabled = !core.isMicEnabled
-        return !core.isMicEnabled
+        return try {
+            core.isMicEnabled = !core.isMicEnabled
+            !core.isMicEnabled
+        } catch (_: Exception) { false }
     }
 
-    fun isMuted(): Boolean = !core.isMicEnabled
+    fun isMuted(): Boolean = try { !core.isMicEnabled } catch (_: Exception) { false }
 
     fun toggleSpeaker(): Boolean {
-        val current = core.outputAudioDevice
-        val targetType =
-            if (current?.type == AudioDevice.Type.Speaker) AudioDevice.Type.Earpiece
-            else AudioDevice.Type.Speaker
-        val target = core.audioDevices.firstOrNull { it.type == targetType }
-        if (target != null) core.outputAudioDevice = target
-        return targetType == AudioDevice.Type.Speaker
+        return try {
+            val current = core.outputAudioDevice
+            val targetType =
+                if (current?.type == AudioDevice.Type.Speaker) AudioDevice.Type.Earpiece
+                else AudioDevice.Type.Speaker
+            val target = core.audioDevices.firstOrNull { it.type == targetType }
+            if (target != null) core.outputAudioDevice = target
+            targetType == AudioDevice.Type.Speaker
+        } catch (_: Exception) { false }
     }
 
-    fun isSpeaker(): Boolean = core.outputAudioDevice?.type == AudioDevice.Type.Speaker
+    fun isSpeaker(): Boolean = try {
+        core.outputAudioDevice?.type == AudioDevice.Type.Speaker
+    } catch (_: Exception) { false }
 
     fun sendDtmf(digit: Char) {
         try { core.currentCall?.sendDtmf(digit) } catch (_: Exception) {}

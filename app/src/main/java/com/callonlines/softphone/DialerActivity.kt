@@ -3,6 +3,7 @@ package com.callonlines.softphone
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -43,9 +44,25 @@ class DialerActivity : AppCompatActivity() {
 
         binding.btnCall.setOnClickListener {
             val number = binding.etNumber.text?.toString()?.trim().orEmpty()
-            if (number.isBlank()) return@setOnClickListener
-            val call = LinphoneManager.call(number)
-            if (call != null) startActivity(Intent(this, CallActivity::class.java))
+            if (number.isBlank()) {
+                Toast.makeText(this, "Escribe un numero", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (LinphoneManager.registrationState.value != RegistrationState.Ok) {
+                Toast.makeText(this, "Espera a estar Conectado", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            try {
+                val call = LinphoneManager.call(number)
+                if (call != null) {
+                    startActivity(Intent(this, CallActivity::class.java))
+                } else {
+                    Toast.makeText(this, "No se pudo iniciar la llamada", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
         }
 
         binding.btnLogout.setOnClickListener {
