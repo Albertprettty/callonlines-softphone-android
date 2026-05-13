@@ -1,7 +1,6 @@
 package com.callonlines.softphone
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import org.linphone.core.Account
 import org.linphone.core.AudioDevice
@@ -15,14 +14,13 @@ import org.linphone.core.TransportType
 
 object LinphoneManager {
 
-    private const val TAG = "LinphoneManager"
-
     private lateinit var core: Core
     private lateinit var factory: Factory
     private var initialized = false
 
     val registrationState = MutableLiveData(RegistrationState.None)
     val callState = MutableLiveData(Call.State.Idle)
+    val callReason = MutableLiveData<String>("")
     val currentCall = MutableLiveData<Call?>(null)
 
     private val coreListener = object : CoreListenerStub() {
@@ -32,7 +30,7 @@ object LinphoneManager {
             state: RegistrationState?,
             message: String
         ) {
-            Log.d(TAG, "Registration -> $state ($message)")
+            DiagLog.i("REG state=$state msg=$message")
             registrationState.postValue(state ?: RegistrationState.None)
         }
 
@@ -42,8 +40,16 @@ object LinphoneManager {
             state: Call.State?,
             message: String
         ) {
-            Log.d(TAG, "Call -> $state ($message)")
+            val errReason = try { call.errorInfo?.reason?.toString() } catch (_: Exception) { null }
+            val errMsg = try { call.errorInfo?.phrase } catch (_: Exception) { null }
+            DiagLog.i("CALL state=$state msg=$message reason=$errReason phrase=$errMsg")
             callState.postValue(state ?: Call.State.Idle)
+            callReason.postValue(buildString {
+                append(state?.toString() ?: "Idle")
+                if (!message.isNullOrBlank()) append(" - ").append(message)
+                if (!errReason.isNullOrBlank()) append(" [").append(errReason).append("]")
+                if (!errMsg.isNullOrBlank()) append(" \"").append(errMsg).append("\"")
+            })
             currentCall.postValue(call)
         }
     }
@@ -52,7 +58,7 @@ object LinphoneManager {
         if (initialized) return
         try {
             factory = Factory.instance()
-            factory.setDebugMode(false, "CallOnLinesSoftphone")
+            factory.setDebugMode(true, "CallOnLinesSoftphone")
             core = factory.createCore(null, null, context)
 
             core.isNetworkReachable = true
@@ -64,9 +70,9 @@ object LinphoneManager {
             core.addListener(coreListener)
             core.start()
             initialized = true
-            Log.i(TAG, "Linphone Core started (version ${core.version})")
-        } catch (e: Exception) {
-            Log.e(TAG, "init failed", e)
+            DiagLog.i("Linphone Core started (version=${core.version})")
+        } catch (t: Throwable) {
+            DiagLog.e("init failed", t)
         }
     }
 
@@ -96,11 +102,11 @@ object LinphoneManager {
             val account = core.createAccount(params)
             core.addAccount(account)
             core.defaultAccount = account
-
             configureCodecs()
+            DiagLog.i("login submitted user=$username domain=$domain transport=$transport")
             true
-        } catch (e: Exception) {
-            Log.e(TAG, "login failed", e)
+        } catch (t: Throwable) {
+            DiagLog.e("login failed", t)
             false
         }
     }
@@ -109,22 +115,44 @@ object LinphoneManager {
         try {
             core.clearAccounts()
             core.clearAllAuthInfo()
-        } catch (_: Exception) {}
+            DiagLog.i("logout done")
+        } catch (t: Throwable) { DiagLog.e("logout failed", t) }
     }
 
     fun call(number: String): Call? {
-        if (!initialized) return null
+        if (!initialized) {
+            DiagLog.w("call() ignored, core not initialized")
+            return null
+        }
         return try {
-            val account = core.defaultAccount ?: return null
-            val domain = account.params.serverAddress?.domain ?: return null
+            val account = core.defaultAccount
+            if (account == null) {
+                DiagLog.w("call(): no default account")
+                return null
+            }
+            val domain = account.params.serverAddress?.domain ?: run {
+                DiagLog.w("call(): no domain")
+                return null
+            }
             val target = if (number.contains("@")) "sip:$number" else "sip:$number@$domain"
-            val address = factory.createAddress(target) ?: return null
-            val params = core.createCallParams(null) ?: return null
+            DiagLog.i("call() target=$target")
+            val address = factory.createAddress(target)
+            if (address == null) {
+                DiagLog.w("call(): could not parse address $target")
+                return null
+            }
+            val params = core.createCallParams(null)
+            if (params == null) {
+                DiagLog.w("call(): createCallParams returned null")
+                return null
+            }
             params.isVideoEnabled = false
             params.mediaEncryption = MediaEncryption.None
-            core.inviteAddressWithParams(address, params)
-        } catch (e: Exception) {
-            Log.e(TAG, "call failed", e)
+            val call = core.inviteAddressWithParams(address, params)
+            DiagLog.i("call() inviteAddressWithParams returned ${call != null}")
+            call
+        } catch (t: Throwable) {
+            DiagLog.e("call() threw", t)
             null
         }
     }
@@ -134,19 +162,17 @@ object LinphoneManager {
             val params = core.createCallParams(call)
             params?.isVideoEnabled = false
             call.acceptWithParams(params)
-        } catch (e: Exception) {
-            Log.e(TAG, "answer failed", e)
-        }
+        } catch (t: Throwable) { DiagLog.e("answer failed", t) }
     }
 
     fun decline(call: Call) {
-        try { call.terminate() } catch (_: Exception) {}
+        try { call.terminate() } catch (t: Throwable) { DiagLog.e("decline failed", t) }
     }
 
     fun hangup() {
         try {
             core.currentCall?.terminate() ?: core.terminateAllCalls()
-        } catch (_: Exception) {}
+        } catch (t: Throwable) { DiagLog.e("hangup failed", t) }
     }
 
     fun toggleMute(): Boolean {
@@ -184,6 +210,7 @@ object LinphoneManager {
             for (pt in core.audioPayloadTypes) {
                 pt.enable(keep.contains(pt.mimeType.lowercase()))
             }
-        } catch (_: Exception) {}
+            DiagLog.i("codecs configured: opus, pcmu, pcma")
+        } catch (t: Throwable) { DiagLog.e("configureCodecs failed", t) }
     }
 }

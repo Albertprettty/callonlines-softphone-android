@@ -60,14 +60,15 @@ class DialerActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             try {
+                DiagLog.i("UI: btnCall pressed number=$number")
                 val call = LinphoneManager.call(number)
                 if (call != null) {
                     startActivity(Intent(this, CallActivity::class.java))
                 } else {
-                    Toast.makeText(this, "No se pudo iniciar la llamada", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "No se pudo iniciar la llamada — ver Diagnostico", Toast.LENGTH_LONG).show()
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            } catch (e: Throwable) {
+                DiagLog.e("UI: btnCall threw", e)
                 Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
@@ -86,6 +87,12 @@ class DialerActivity : AppCompatActivity() {
                 }
                 .setNegativeButton("Cancelar", null)
                 .show()
+        }
+
+        // Long-press the logout icon to open the diagnostic screen.
+        binding.btnLogout.setOnLongClickListener {
+            startActivity(Intent(this, DiagActivity::class.java))
+            true
         }
 
         LinphoneManager.registrationState.observe(this) { state ->

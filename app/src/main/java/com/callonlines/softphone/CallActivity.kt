@@ -30,7 +30,10 @@ class CallActivity : AppCompatActivity() {
         binding = ActivityCallBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnHangup.setOnClickListener { LinphoneManager.hangup() }
+        binding.btnHangup.setOnClickListener {
+            LinphoneManager.hangup()
+            finish()
+        }
         binding.btnMute.setOnClickListener { updateMuteUI(LinphoneManager.toggleMute()) }
         binding.btnSpeaker.setOnClickListener { updateSpeakerUI(LinphoneManager.toggleSpeaker()) }
         binding.btnAnswer.setOnClickListener {
@@ -38,6 +41,7 @@ class CallActivity : AppCompatActivity() {
         }
         binding.btnDecline.setOnClickListener {
             LinphoneManager.currentCall.value?.let { LinphoneManager.decline(it) }
+            finish()
         }
 
         updateMuteUI(LinphoneManager.isMuted())
@@ -72,15 +76,19 @@ class CallActivity : AppCompatActivity() {
                 }
                 Call.State.End, Call.State.Released -> {
                     timerHandler.removeCallbacks(timerRunnable)
-                    finish()
+                    binding.tvStatus.text = "Llamada finalizada"
+                    // Stay on screen so user can see the reason and tap Hangup to close.
                 }
                 Call.State.Error -> {
-                    binding.tvStatus.text = "Error en llamada"
                     timerHandler.removeCallbacks(timerRunnable)
-                    finish()
+                    binding.tvStatus.text = "Error en llamada"
                 }
                 else -> {}
             }
+        }
+
+        LinphoneManager.callReason.observe(this) { reason ->
+            binding.tvReason.text = reason
         }
 
         LinphoneManager.currentCall.observe(this) { call ->

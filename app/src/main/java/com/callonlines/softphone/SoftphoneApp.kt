@@ -8,8 +8,25 @@ import android.os.Build
 class SoftphoneApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        DiagLog.init(this)
+        installCrashHandler()
         createNotificationChannels()
-        LinphoneManager.init(this)
+        try {
+            LinphoneManager.init(this)
+            DiagLog.i("LinphoneManager.init invoked")
+        } catch (t: Throwable) {
+            DiagLog.e("LinphoneManager.init threw", t)
+        }
+    }
+
+    private fun installCrashHandler() {
+        val prev = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            try {
+                DiagLog.e("UNCAUGHT in ${thread.name}", throwable)
+            } catch (_: Throwable) {}
+            prev?.uncaughtException(thread, throwable)
+        }
     }
 
     private fun createNotificationChannels() {
